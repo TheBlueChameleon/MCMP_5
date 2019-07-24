@@ -23,17 +23,18 @@
 // nature constants
 
 const double PI = std::atan(1.0) * 4;
+const std::complex<double> I = std::complex<double>(0, 1);
 
 // ------------------------------------------------------------------------- //
 // simulation behaviour
 
-extern const double outerT_lo = 1.0;
-extern const double outerT_hi = 4.0;
-extern const double outerT_dT = 0.1;
+extern const double outerT_lo = 0.25;
+extern const double outerT_hi = 4.00;
+extern const double outerT_dT = 0.25;
 
-extern const double innerT_lo = 2.1;
-extern const double innerT_hi = 2.4;
-extern const double innerT_dT = 0.02;
+extern const double innerT_lo = 0.25;
+extern const double innerT_hi = 1.00;
+extern const double innerT_dT = 0.10;
 
 // ------------------------------------------------------------------------- //
 // log behaviour

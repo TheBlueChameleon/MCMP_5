@@ -14,6 +14,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <complex>
 
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
@@ -45,7 +46,8 @@
 // ------------------------------------------------------------------------- //
 // nature constants
 
-extern const double PI;
+extern const double               PI;
+extern const std::complex<double> I;
 
 // ------------------------------------------------------------------------- //
 // simulation behaviour
@@ -75,6 +77,11 @@ extern gsl_rng * RNG;
 // procs
 
 void RNG_init ();
+
+// ========================================================================= //
+// inline procs
+
+inline double randBetween(const double lo, const double hi) {return lo + (hi - lo) * gsl_rng_uniform(RNG);}
 
 // ========================================================================= //
 // template procs
