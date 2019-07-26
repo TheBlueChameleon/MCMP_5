@@ -85,7 +85,6 @@ int main () {
     }
   };
   
-  
   std::cout << SEPARATOR << std::endl;
   std::cout << "Running low T calibration at T = "  << outerT_lo << std::endl;
   model.setT(outerT_lo);

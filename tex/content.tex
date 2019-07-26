@@ -1,0 +1,57 @@
+\chapter{Approach}
+For this simulation I created a class \texttt{Grid}, representing the lattice sites. The grid stores the orientation of each spin as well as its current momentum in a \mintinline{c++}{std::vector<double>}. Further, the site IDs of the neighbours of each site are stored in a \mintinline{c++}{std::vector<int>}.
+
+For convenience, the class offers a constructor with a parameter \texttt{Startcondition} which is either of the constants \texttt{COLDSTART} or \texttt{HOTSTART}. That is, the grid is either initialized with all spins parallel or with completely random spins. In the further simulation I used the \texttt{COLDSTART} setting.
+
+Further, there are accessors to the configuration vector \texttt{Q} and the momentum vector \texttt{P}. In particular I implemented an interface to use the STL \texttt{swap} method on these vectors. This allowed me to work on local copies of the grid in the simulation method that could replace the grid data without copying back the entire vector; rejecting a Markov chain point simply means doing nothing with the grid state.
+
+Finally, the class offers a method to generate a momentum vector state with normal distribution.
+
+The class \texttt{Grid} is a member of the class \texttt{HMC} which runs the hybrid Monte Carlo simulation on the Grid. Like in the last project, this class offers methods to read the thermodynamic properties of the associated grid state (energy density and magnetization density) as well as a method to evaluate a Hamiltonian on the grid. This Hamiltonian reads
+
+\begin{equation}
+	\Ham = \dfrac{1}{V} \left(
+		 \sum_{i} \dfrac{p_i^{2}}{2m}
+		 -
+		 \dfrac{\beta}{2}
+		 \sum_{<i, j>} \cos(q_i - q_j)
+	\right)
+\end{equation}
+
+where the prefactor $\smallfrac{1}{2}$ to the potential term avoids overcounting. In the implementation, only the \emph{forward} sum is computed, \ie only the nearest neighbours in forward direction are evaluated.
+
+Private \mintinline{c++}{std::vector<int>}s \texttt{historyE} and \texttt{historyM} store the Markov chain for a given temperature and are the basis for the computation of average energy density, magnetization density, specific heat density and magnetic susceptibility density. For these properties I adapted the methods from the last project which required only minimal changes.
+
+The method \texttt{run} takes an \mintinline{c++}{int} parameter indicating the number of Markov chain elements. It starts by resetting the grid according to the selected \texttt{Startcondition} and clearing both the \texttt{historyX} vectors and the result member variables.
+
+For each Markov chain point, a new momentum vector \texttt{P} is generated. Based on this, the leapfrog algorithm generates a new lattice configuration which is accepted with a probability based on the difference of the Hamiltonian of the old and the new configuration. I used a lambda function to find the first derivative wrt. time of \texttt{P} which takes one \mintinline{c++}{double} parameter indicating a half- or full time step. Updating the \texttt{Q} values takes only a simple \mintinline{c++}{for}-loop and does not justify using the same technique.
+
+\chapter{Parameters $n_{steps}$ and $dt$}
+As per usual we aim for a small number of Markov steps between independent measurements, such that the error on the estimates is as small as possible. At the same time, we would like to minimize the computation time needed to get from one configuration to the next independent configuration. This computational effort is characterized by the number $t_{indep} = 2 \tau_{int} n_{steps}$ where $n_{steps}$ is the number of leapfrog steps. Each leapfrog step corresponds to a step in time by $dt$, so we have two parameters that can influence the effort measure.
+
+Figures \ref{fig:runtimeT1} and \ref{fig:runtimeT4} show the requirement for high and low temperatures after sampling of logarithmically spaced points in the $(n, dt)$-plane. We see that small numbers of leapfrog steps $n_{steps}$ are generally preferable while the impact of the time stride $dt$ is of lesser import. However, time steps greater than $0.5$ lead to a high rejection rate of the Markov chain proposals.
+
+The optimum for the low-temperature limit ($T=0.25$) was $(n, dt) = (2, 0.2)$ while for the high-temperature case ($T=4.00$) was determined to be $(n, dt) = (4, 0.4)$. I opted for linear interpolation of the optima for the high- and low-temperature case as they are close on the $(n, dt)$-plane.
+
+It is noteworthy that the impact of the number of leapfrog steps $n_{steps}$ has a higher impact in the low-T limit. This is due to the lesser acceptance rate in the low-T end.
+
+\begin{figure}
+	\includegraphics[page=1, width=\linewidth]{./gfx/results}
+	\caption{Runtime map for T=0.45} \label{fig:runtimeT1}
+	\includegraphics[page=2, width=\linewidth]{./gfx/results}
+	\caption{Runtime map for T=4} \label{fig:runtimeT4}
+\end{figure}
+
+\chapter{Results}
+Figure \ref{fig:mag} plots the magnetization density vs. temperature. We see the characteristic curve we already found with the Ising model with a steep decline in magnetization around the critical temperature $T_C \approx 1$ and near-constant behaviour far from this point of phase transition.
+
+The behaviour is mirrored in figure \ref{fig:chi} where magnetic susceptibility density is plottet against temperature. Susceptibilty starts out at a given level, peaks around the phase transition and then asymptotically approaches zero.
+
+Errors for both, magnetization and susceptibility density are reasonably small, but become more important around the phase transition.
+
+\begin{figure}
+	\includegraphics[page=4, width=\linewidth]{./gfx/results}
+	\caption{Magnetization Density vs. Temperature} \label{fig:mag}
+	\includegraphics[page=6, width=\linewidth]{./gfx/results}
+	\caption{Magnetizatic Susceptibility Density vs. Temperature} \label{fig:chi}
+\end{figure}

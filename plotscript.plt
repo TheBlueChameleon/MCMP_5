@@ -7,8 +7,10 @@ set output "results.pdf"
 # =========================================================================== #
 # calibration plots
 
-set dgrid3d 32,32
+set dgrid3d 20,50 
 set xyplane at 0
+
+set logscale x 2
 
 set palette rgbformulae 23,28,3
 unset surface
@@ -16,7 +18,7 @@ set pm3d at b
 set pm3d 
 set pm3d map
 
-set xrange [0:16]
+set xrange [2:16]
 
 set xlabel 'leapfrog steps n'
 set ylabel 'leapfrog time step dt'
@@ -25,7 +27,7 @@ show title
 set key off
 
 # --------------------------------------------------------------------------- #
-set title "Computation Cost for low T\nEstimate for t_{indep}"
+set title "Computation Cost for low T\nEstimate for t_{indep}\n"
 splot './out/cal.dat' u 1:2:3
 
 set title "Computation Cost for high T\nEstimate for t_{indep}"
@@ -35,7 +37,7 @@ splot './out/cal.dat' u 4:5:6
 # behaviour plots
 
 reset
-set key box opaque
+set nokey
 show title
 
 set  xlabel 'Temperature T'
@@ -48,8 +50,6 @@ set style line 3 linecolor rgb 'green' pointtype 1
 # --------------------------------------------------------------------------- #
 set title 'Energy Density vs. Temperature'
 
-set key left top
-
 set  ylabel 'e(T)'
 show ylabel
 
@@ -57,8 +57,6 @@ plot  './out/EMCX.dat'      using 1:2:3 title 'data'      with errorbars linesty
 
 # --------------------------------------------------------------------------- #
 set title 'Magnetization Density vs. Temperature'
-
-set key right top
 
 set  ylabel '|m(T)|'
 show ylabel
