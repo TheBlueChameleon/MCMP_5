@@ -15,6 +15,12 @@
 #include "HMC.hpp"
 
 // ========================================================================= //
+// switches
+
+// #define RUN_CALIBRATION
+#define RUN_SIMULATION
+
+// ========================================================================= //
 // dependencies
 
 int main () {
@@ -27,14 +33,19 @@ int main () {
   // ----------------------------------------------------------------------- //
   // setup
   const int L    = 16;
-  const int N_MC = 10000;
+  const int N_MC = 25000;
   
+#ifdef RUN_SIMULATION
   const std::string fn_EMCX = "./out/EMCX.dat";
   std::ofstream     fh_EMCX(fn_EMCX);
+#endif
   
+#ifdef RUN_CALIBRATION
   const std::string fn_cal = "./out/cal.dat";
   std::ofstream     fh_cal(fn_cal);
+#endif
   
+#ifdef RUN_SIMULATION
   fh_EMCX
       << "# "
       << "temperature T\t"
@@ -44,23 +55,29 @@ int main () {
       << "magnetic susceptibility chi\terror on chi"
       << std::endl;
   
-  fh_cal
-      << "# n/dt calibration. First block is lo-T, second is hi-T\n"
-      << "# n\tdt\t2 *n * tau\tn\tdt\t2 *n * tau"
-      << std::endl;
-  
   double dT = outerT_dT;
   
   std::cout << SEPARATOR;
   std::cout << "Setup with dimension L=" << L << std::endl;
+  
+#endif
+  
   HMC model(L, Startcondition::COLDSTART);
+  
+#ifdef RUN_CALIBRATION
+  fh_cal
+      << "# n/dt calibration. First block is lo-T, second is hi-T\n"
+      << "# n\tdt\t2 *n * tau\tn\tdt\t2 *n * tau"
+      << std::endl;
+#endif
   
   
   // ----------------------------------------------------------------------- //
   // calibration
   
-  std::vector<int>    propN  = {   2,    4,   8,  16     };
-  std::vector<double> propDT = {0.01, 0.05, 0.1, 0.2, 0.4};
+#ifdef RUN_CALIBRATION
+  std::vector<int>    propN  = {   2,    3,   4,   6,   8,   12,   16     };
+  std::vector<double> propDT = {0.01, 0.05, 0.1, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.50, 0.60};
   std::vector<double> valNTau( propN.size() * propDT.size() * 2 );    // holds all estimates for t_indep, for both temperatures -- hence the * 2.
   auto records = valNTau.size() / 2;
   
@@ -101,13 +118,13 @@ int main () {
   for (auto i=0u; i<records; i++) {
     // lo T section
     fh_cal << propN  [ i / propDT.size() ] << "\t";      // "x-value": n
-    fh_cal << propDT [ i % propN .size() ] << "\t";      // "y-value": dt
+    fh_cal << propDT [ i % propDT.size() ] << "\t";      // "y-value": dt
     fh_cal << valNTau[ i                 ] << "\t";      // "z-value": n * tau
     
     // hi T section
     fh_cal << propN  [ i / propDT.size() ] << "\t";      // "x-value": n
-    fh_cal << propDT [ i % propN .size() ] << "\t";      // "y-value": dt
-    fh_cal << valNTau[i        + records ] << "\t";      // "z-value": n * tau
+    fh_cal << propDT [ i % propDT.size() ] << "\t";      // "y-value": dt
+    fh_cal << valNTau[ i       + records ] << "\t";      // "z-value": n * tau
     
     fh_cal << std::endl;
   }
@@ -129,23 +146,28 @@ int main () {
   
   fh_cal    << "# Optimum for low  T: (n, dt) = (" << NLo << ", " << dtLo << ")" << std::endl;
   fh_cal    << "# Optimum for high T: (n, dt) = (" << NHi << ", " << dtHi << ")" << std::endl;
+#endif
   
   // ----------------------------------------------------------------------- //
   // run
   
+#ifdef RUN_SIMULATION
   std::cout << SEPARATOR << std::endl;
   std::cout << "About to begin productive run." << std::endl;
   
-  double dt, Ns;
+  model.setSteps(12);
+  model.setDT   (0.25);
+  
+//   double dt, Ns;
   for (auto T = outerT_lo; T <= outerT_hi; T += dT) {
     if (between(T, innerT_lo, innerT_hi)) {dT = innerT_dT;}
     else                                  {dT = outerT_dT;}
     
-    dt = dtLo + (T - outerT_lo) / (outerT_hi - outerT_lo) * (dtHi - dtLo);
-    Ns =  NLo + (T - outerT_lo) / (outerT_hi - outerT_lo) * ( NHi -  NLo);
+//     dt = dtLo + (T - outerT_lo) / (outerT_hi - outerT_lo) * (dtHi - dtLo);
+//     Ns =  NLo + (T - outerT_lo) / (outerT_hi - outerT_lo) * ( NHi -  NLo);
     
-    model.setDT   (dt);
-    model.setSteps(Ns);
+//     model.setDT   (dt);
+//     model.setSteps(Ns);
     
     model.setT(T);
     model.run(N_MC);
@@ -180,11 +202,17 @@ int main () {
     skipPointEMCX:
     std::cout << "done" << std::endl;
   }
+#endif
+  
   // ----------------------------------------------------------------------- //
   // tidy up
-  
+
+#ifdef RUN_SIMULATION
   fh_EMCX.close();
-  fh_cal  .close();
+#endif
+#ifdef RUN_CALIBRATION
+  fh_cal .close();
+#endif
   
   std::cout << "simulation done." << std::endl;
   DEBUG_END;

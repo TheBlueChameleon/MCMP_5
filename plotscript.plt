@@ -7,31 +7,43 @@ set output "results.pdf"
 # =========================================================================== #
 # calibration plots
 
-set dgrid3d 20,50 
-set xyplane at 0
+set dgrid3d 14,18 
+# set xyplane at 0
 
-set logscale x 2
+# set logscale x 2
+# set logscale y 2
 
-set palette rgbformulae 23,28,3
-unset surface
+set palette model HSV
+set palette rgb 3,2,2
+
+# unset surface
 set pm3d at b
-set pm3d 
-set pm3d map
+# set pm3d 
+# set pm3d map
 
-set xrange [2:16]
+set view 50, 350
 
-set xlabel 'leapfrog steps n'
-set ylabel 'leapfrog time step dt'
+set xrange [   2:*]
+set yrange [0.01:*]
+set zrange [0:2500]
+
+unset ztics 
+unset border
+
+set xlabel "leapfrog steps\n n_{steps}"
+set ylabel "leapfrog time\n step dt"
 
 show title
 set key off
 
+set colorbox vertical user origin 0.85,0.02 size .05,.9
+
 # --------------------------------------------------------------------------- #
-set title "Computation Cost for low T\nEstimate for t_{indep}\n"
-splot './out/cal.dat' u 1:2:3
+set title "Computation Cost for low T\nEstimate for t_{indep}\n" offset 0, -1
+splot './out/cal.dat' u 1:2:3 with lines
 
 set title "Computation Cost for high T\nEstimate for t_{indep}"
-splot './out/cal.dat' u 4:5:6
+splot './out/cal.dat' u 4:5:6 with lines
 
 # =========================================================================== #
 # behaviour plots

@@ -29,15 +29,19 @@ For each Markov chain point, a new momentum vector \texttt{P} is generated. Base
 \chapter{Parameters $n_{steps}$ and $dt$}
 As per usual we aim for a small number of Markov steps between independent measurements, such that the error on the estimates is as small as possible. At the same time, we would like to minimize the computation time needed to get from one configuration to the next independent configuration. This computational effort is characterized by the number $t_{indep} = 2 \tau_{int} n_{steps}$ where $n_{steps}$ is the number of leapfrog steps. Each leapfrog step corresponds to a step in time by $dt$, so we have two parameters that can influence the effort measure.
 
-Figures \ref{fig:runtimeT1} and \ref{fig:runtimeT4} show the requirement for high and low temperatures after sampling of logarithmically spaced points in the $(n, dt)$-plane. We see that small numbers of leapfrog steps $n_{steps}$ are generally preferable while the impact of the time stride $dt$ is of lesser import. However, time steps greater than $0.5$ lead to a high rejection rate of the Markov chain proposals.
+Figures \ref{fig:runtimeT1} and \ref{fig:runtimeT4} show the requirement for high and low temperatures after sampling of points in the $(n_{steps}, dt)$-plane. We see that small numbers of leapfrog steps $n_{steps}$ are generally preferable while the impact of the time stride $dt$ is of lesser import. However, time steps greater than $0.5$ lead to a high rejection rate of the Markov chain proposals.
 
-The optimum for the low-temperature limit ($T=0.25$) was $(n, dt) = (2, 0.2)$ while for the high-temperature case ($T=4.00$) was determined to be $(n, dt) = (4, 0.4)$. I opted for linear interpolation of the optima for the high- and low-temperature case as they are close on the $(n, dt)$-plane.
+The optimum for the low-temperature limit ($T=0.30$) was $(n, dt) = (16, 0.25)$ while for the high-temperature case ($T=4.00$) was determined to be $(n, dt) = (2, 0.6)$. Running simulations with 16 leapfrog steps takes considerable time. Also, the settings are not optimal for the high-temperature simulation. There is a zone of reasonably short time between independent configurations $t_{indep}$ around $(12, 0.25)$, so I used this setting for the entire sweep.
 
-It is noteworthy that the impact of the number of leapfrog steps $n_{steps}$ has a higher impact in the low-T limit. This is due to the lesser acceptance rate in the low-T end.
+The plots of the $(n_{steps}, dt)$-map appear \enquote{striped}, \ie the number of leapfrog steps determines the tendency of runtime behaviour and is only amplified by certain choices of time steps. In particular for $n_{steps} = 12$ there is virtually no dependence on the parameter $dt$ for both, the high- and low-temperature scenario.
+
+For high temperatures, longer time steps are preferable as they cause faster mutation of the lattice configuration. For cool temperatures, on the other hand, short time steps are advantageous, as the acceptance rate is much lower.
+
+It is noteworthy that the impact of the number of leapfrog steps $n_{steps}$ has a higher impact in the low-T limit. This is due to the lesser acceptance rate in the low-T end. Further, settings where the mutation rate is low (\ie where $n$ and $dt$ both are low) are unfavourable. In the below plots, they are rendered white since 
 
 \begin{figure}
 	\includegraphics[page=1, width=\linewidth]{./gfx/results}
-	\caption{Runtime map for T=0.45} \label{fig:runtimeT1}
+	\caption{Runtime map for T=0.30} \label{fig:runtimeT1}
 	\includegraphics[page=2, width=\linewidth]{./gfx/results}
 	\caption{Runtime map for T=4} \label{fig:runtimeT4}
 \end{figure}
