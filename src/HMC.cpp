@@ -274,8 +274,15 @@ double HMC::getTauE          () {
     this->tauE = autocorrelationTime(this->historyE);
     if (std::isnan(this->tauE)) {return NAN;}
     
+    if (20 * this->tauE > this->historyE.size()) {
+      std::cerr << "Warning: Insufficient data to discard thermalization phase" << std::endl;
+      return this->tauE;
+    }
+    
     this->tauE = autocorrelationTime(this->historyE, 20 * this->tauE);
-    if (20 * this->tauE > this->historyE.size()) {this->tauE = NAN;}
+    if (20 * this->tauE > this->historyE.size()) {
+      std::cerr << "Warning: Insufficient data to discard thermalization phase" << std::endl;
+    }
   }
   
   return this->tauE;
@@ -285,6 +292,7 @@ double HMC::getTauM          () {
   if (std::isnan(this->tauM)) {
     this->tauM = autocorrelationTime(this->historyM);
     if (std::isnan(this->tauM)) {return NAN;}
+    
     if (20 * this->tauM > this->historyM.size()) {
       std::cerr << "Warning: Insufficient data to discard thermalization phase" << std::endl;
       return this->tauM;

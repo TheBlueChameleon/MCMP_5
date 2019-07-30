@@ -35,15 +35,13 @@ The optimum for the low-temperature limit ($T=0.30$) was $(n, dt) = (16, 0.25)$ 
 
 The plots of the $(n_{steps}, dt)$-map appear \enquote{striped}, \ie the number of leapfrog steps determines the tendency of runtime behaviour and is only amplified by certain choices of time steps. In particular for $n_{steps} = 12$ there is virtually no dependence on the parameter $dt$ for both, the high- and low-temperature scenario.
 
-For high temperatures, longer time steps are preferable as they cause faster mutation of the lattice configuration. For cool temperatures, on the other hand, short time steps are advantageous, as the acceptance rate is much lower.
-
-It is noteworthy that the impact of the number of leapfrog steps $n_{steps}$ has a higher impact in the low-T limit. This is due to the lesser acceptance rate in the low-T end. Further, settings where the mutation rate is low (\ie where $n$ and $dt$ both are low) are unfavourable. In the below plots, they are rendered white since 
+For high temperatures, longer time steps are preferable as they cause faster mutation of the lattice configuration. For cool temperatures, on the other hand, short time steps are advantageous, as the acceptance rate is much lower. Both plots cointain points rendered in white (\ie where them time between independent configurations is too large for the chosen colour map) in the $n_{steps} = 2$ column. This is due to the low mutation rate with only two leapfrog steps. However, due to the impact of the accept/reject step this occurs at different ends of the $dt$-spectrum for the high- and low-temperature case.
 
 \begin{figure}
 	\includegraphics[page=1, width=\linewidth]{./gfx/results}
 	\caption{Runtime map for T=0.30} \label{fig:runtimeT1}
 	\includegraphics[page=2, width=\linewidth]{./gfx/results}
-	\caption{Runtime map for T=4} \label{fig:runtimeT4}
+	\caption{Runtime map for T=4.00} \label{fig:runtimeT4}
 \end{figure}
 
 \chapter{Results}
@@ -52,6 +50,8 @@ Figure \ref{fig:mag} plots the magnetization density vs. temperature. We see the
 The behaviour is mirrored in figure \ref{fig:chi} where magnetic susceptibility density is plottet against temperature. Susceptibilty starts out at a given level, peaks around the phase transition and then asymptotically approaches zero.
 
 Errors for both, magnetization and susceptibility density are reasonably small, but become more important around the phase transition.
+
+The maximum in magnetic susceptibility density was found at $T = 1.12$ with $\chi(1.12) = 4.33877 \pm 0.111355$ so there is only a $2.5\%$ error on the estimate. This suggests that the choice for $n_{steps}$ and $dt$ was a reasonable one.
 
 \begin{figure}
 	\includegraphics[page=4, width=\linewidth]{./gfx/results}
